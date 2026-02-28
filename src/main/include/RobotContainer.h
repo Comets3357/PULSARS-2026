@@ -7,7 +7,11 @@
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/button/CommandXboxController.h>
 
+
+#include "Subsystems/IndexSubsystem.h"
 #include "Subsystems/DriveSubsystem.h"
+#include "Subsystems/ShooterSubsystem.h"
+#include "Subsystems/ClimbSubsystem.h"
 
 class RobotContainer {
  public:
@@ -20,4 +24,7 @@ class RobotContainer {
 
   DriveSubsystem drive{};
   frc2::CommandXboxController controller{0};
+  IndexSubsystem indexSubsystem{};
+  ShooterSubsystem shooterSubsystem{};
+  ClimbSubsystem climbSubsystem{};
 };
