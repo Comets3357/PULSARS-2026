@@ -47,9 +47,9 @@ void RobotContainer::ConfigureBindings() {
   
   //Climbing
   controller.RightBumper().OnTrue(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(0.3);}, {&climbSubsystem}));
-  controller.X().OnTrue(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(0);}, {&climbSubsystem}));
   controller.LeftBumper().OnTrue(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(-0.3);}, {&climbSubsystem}));
-
+  controller.RightBumper().OnFalse(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(0);}, {&climbSubsystem}));
+  controller.LeftBumper().OnFalse(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(0);}, {&climbSubsystem}));
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
