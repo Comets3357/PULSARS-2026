@@ -7,9 +7,8 @@
 #include <frc2/command/CommandPtr.h>
 #include <frc2/command/button/CommandXboxController.h>
 
-
-#include "Subsystems/IndexSubsystem.h"
 #include "Subsystems/DriveSubsystem.h"
+#include "Subsystems/IndexSubsystem.h"
 #include "Subsystems/ShooterSubsystem.h"
 #include "Subsystems/ClimbSubsystem.h"
 

@@ -11,5 +11,5 @@ class ClimbSubsystem : public frc2::SubsystemBase {
   void SetSpeed(double speed);
 
  private:
-  rev::spark::SparkMax m_climbMotor{12, rev::spark::SparkMax::MotorType::kBrushless};
+  rev::spark::SparkMax m_climbMotor{21, rev::spark::SparkMax::MotorType::kBrushless};
 };
