@@ -26,4 +26,13 @@ class RobotContainer {
   IndexSubsystem indexSubsystem{};
   ShooterSubsystem shooterSubsystem{};
   ClimbSubsystem climbSubsystem{};
+
+  nt::DoublePublisher targetFlyWheelSpeedPub = nt::NetworkTableInstance::GetDefault().GetDoubleTopic("Flywheel target setpoint").Publish();
+  nt::DoubleSubscriber targetFlyWheelSpeedSub = nt::NetworkTableInstance::GetDefault().GetDoubleTopic("Flywheel target setpoint").Subscribe(0);
+
+  nt::DoublePublisher targetIndexerSpeedPub = nt::NetworkTableInstance::GetDefault().GetDoubleTopic("Indexer target setpoint").Publish();
+  nt::DoubleSubscriber targetIndexerSpeedSub = nt::NetworkTableInstance::GetDefault().GetDoubleTopic("Indexer target setpoint").Subscribe(0);
+
+  nt::DoublePublisher targetSpinupSpeedPub = nt::NetworkTableInstance::GetDefault().GetDoubleTopic("Spinup target threshold").Publish();
+  nt::DoubleSubscriber targetSpinupSpeedSub = nt::NetworkTableInstance::GetDefault().GetDoubleTopic("Spinup target threshold").Subscribe(0);
 };

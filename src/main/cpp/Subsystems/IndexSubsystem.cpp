@@ -2,7 +2,7 @@
 
 IndexSubsystem::IndexSubsystem() {
   rev::spark::SparkBaseConfig config;
-  config.SmartCurrentLimit(40);
+  config.SmartCurrentLimit(60);
   config.Inverted(true);
   config.SetIdleMode(rev::spark::SparkBaseConfig::IdleMode::kCoast);
   m_indexMotor.Configure(config, rev::spark::SparkBase::ResetMode::kResetSafeParameters,

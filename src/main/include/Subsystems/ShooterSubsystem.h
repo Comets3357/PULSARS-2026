@@ -19,4 +19,6 @@ class ShooterSubsystem : public frc2::SubsystemBase {
     rev::spark::SparkRelativeEncoder m_shooterEncoder = m_shooterMotor.GetEncoder();
 
     nt::DoublePublisher flyWheelSpeed = nt::NetworkTableInstance::GetDefault().GetDoubleTopic("Flywheel setpoint").Publish();
+
+    
 };

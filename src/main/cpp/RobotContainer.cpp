@@ -10,6 +10,10 @@
 #include <frc2/command/WaitUntilCommand.h>
 
 RobotContainer::RobotContainer() {
+  targetFlyWheelSpeedPub.Set(0);
+  targetIndexerSpeedPub.Set(0);
+  targetSpinupSpeedPub.Set(0);
+
   ConfigureBindings();
 }
 
@@ -41,9 +45,13 @@ void RobotContainer::ConfigureBindings() {
   controller.A().OnFalse(frc2::cmd::RunOnce([this] () { shooterSubsystem.SetSpeed(0);}, {&shooterSubsystem}));
   controller.A().OnFalse(frc2::cmd::RunOnce([this] () { indexSubsystem.SetSpeed(0);}, {&indexSubsystem}));
   
-  controller.A().OnTrue(frc2::cmd::RunOnce([this] () { shooterSubsystem.SetSpeed(1); indexSubsystem.SetSpeed(0);}, {&shooterSubsystem, &indexSubsystem})
-  .AlongWith(frc2::WaitUntilCommand([this]()->bool { return shooterSubsystem.GetVelocity() > 3500;}).ToPtr())
-  .AndThen(frc2::cmd::RunOnce([this] () {indexSubsystem.SetSpeed(1);}, {&indexSubsystem})));
+  // controller.A().OnTrue(frc2::cmd::RunOnce([this] () { shooterSubsystem.SetSpeed(1); indexSubsystem.SetSpeed(0);}, {&shooterSubsystem, &indexSubsystem})
+  // .AlongWith(frc2::WaitUntilCommand([this]()->bool { return shooterSubsystem.GetVelocity() > 3500;}).ToPtr())
+  // .AndThen(frc2::cmd::RunOnce([this] () {indexSubsystem.SetSpeed(1);}, {&indexSubsystem})));
+
+  controller.A().OnTrue(frc2::cmd::RunOnce([this] () { shooterSubsystem.SetSpeed(targetFlyWheelSpeedSub.Get()); indexSubsystem.SetSpeed(0);}, {&shooterSubsystem, &indexSubsystem})
+  .AlongWith(frc2::WaitUntilCommand([this]()->bool { return shooterSubsystem.GetVelocity() > targetSpinupSpeedSub.Get();}).ToPtr())
+  .AndThen(frc2::cmd::RunOnce([this] () {indexSubsystem.SetSpeed(targetIndexerSpeedSub.Get());}, {&indexSubsystem})));
   
   //Climbing
   controller.RightBumper().OnTrue(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(0.3);}, {&climbSubsystem}));
