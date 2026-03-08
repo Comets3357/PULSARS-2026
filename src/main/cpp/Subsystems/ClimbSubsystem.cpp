@@ -5,8 +5,8 @@ ClimbSubsystem::ClimbSubsystem() {
   config.SmartCurrentLimit(40);
   config.Inverted(true);
   config.SetIdleMode(rev::spark::SparkBaseConfig::IdleMode::kCoast);
-  m_climbMotor.Configure(config, rev::spark::SparkBase::ResetMode::kResetSafeParameters,
-                          rev::spark::SparkBase::PersistMode::kPersistParameters);
+  m_climbMotor.Configure(config, rev::ResetMode::kResetSafeParameters,
+                          rev::PersistMode::kPersistParameters);
 }
 
 void ClimbSubsystem::Periodic() {

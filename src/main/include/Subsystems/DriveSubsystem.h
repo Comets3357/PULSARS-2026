@@ -9,22 +9,34 @@
 #include <frc/geometry/Rotation2d.h>
 #include <frc/kinematics/ChassisSpeeds.h>
 #include <frc/kinematics/SwerveDriveKinematics.h>
-#include <frc/kinematics/SwerveDriveOdometry.h>
+#include <frc/estimator/SwerveDrivePoseEstimator.h>
 #include <frc2/command/SubsystemBase.h>
 
 #include <redux/sensors/Canandgyro.h>
 
 #include "Constants.h"
 #include "MAXSwerveModule.h"
+#include "Subsystems/VisionSubsystem.h"
 
 class DriveSubsystem : public frc2::SubsystemBase {
  public:
   DriveSubsystem();
+  
 
   /**
    * Will be called periodically whenever the CommandScheduler runs.
    */
   void Periodic() override;
+
+  void TurnToAngle(units::meters_per_second_t xSpeed,
+             units::meters_per_second_t ySpeed, units::degree_t targetAngle);
+
+  void TurnToTarget(units::meters_per_second_t xSpeed,
+             units::meters_per_second_t ySpeed, frc::Translation2d target);
+
+  void GoToPosition(units::meter_t targetRange, frc::Translation2d target); //TODO: add target angle
+
+  void GoToRange(units::meter_t targetRange, frc::Translation2d target);
 
   // Subsystem methods go here.
 
@@ -109,6 +121,8 @@ class DriveSubsystem : public frc2::SubsystemBase {
   MAXSwerveModule m_rearLeft;
   MAXSwerveModule m_frontRight;
   MAXSwerveModule m_rearRight;
+  
+  VisionSubsystem m_visionSubsystem{};
 
   // The gyro sensor
   redux::sensors::canandgyro::Canandgyro m_gyro{9};
@@ -116,5 +130,5 @@ class DriveSubsystem : public frc2::SubsystemBase {
 
   // Odometry class for tracking robot pose
   // 4 defines the number of modules
-  frc::SwerveDriveOdometry<4> m_odometry;
+  frc::SwerveDrivePoseEstimator<4> m_odometry;
 };

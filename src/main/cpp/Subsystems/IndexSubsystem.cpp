@@ -5,8 +5,8 @@ IndexSubsystem::IndexSubsystem() {
   config.SmartCurrentLimit(40);
   config.Inverted(true);
   config.SetIdleMode(rev::spark::SparkBaseConfig::IdleMode::kCoast);
-  m_indexMotor.Configure(config, rev::spark::SparkBase::ResetMode::kResetSafeParameters,
-                          rev::spark::SparkBase::PersistMode::kPersistParameters);
+  m_indexMotor.Configure(config, rev::ResetMode::kResetSafeParameters,
+                          rev::PersistMode::kPersistParameters);
 }
 
 void IndexSubsystem::Periodic() {

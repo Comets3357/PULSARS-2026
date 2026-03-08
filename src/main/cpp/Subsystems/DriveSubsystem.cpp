@@ -14,6 +14,14 @@
 
 using namespace DriveConstants;
 
+//Field Constants:
+
+const frc::Translation2d blueHubLocation{frc::LoadAprilTagLayoutField(frc::AprilTagField::k2026RebuiltWelded).GetTagPose(26).value().ToPose2d().X() + (47.0_in / 2.0),
+            frc::LoadAprilTagLayoutField(frc::AprilTagField::k2026RebuiltWelded).GetFieldWidth() / 2.0};
+
+const frc::Translation2d redHubLocation{frc::LoadAprilTagLayoutField(frc::AprilTagField::k2026RebuiltWelded).GetTagPose(10).value().ToPose2d().X() - (47.0_in / 2.0),
+            frc::LoadAprilTagLayoutField(frc::AprilTagField::k2026RebuiltWelded).GetFieldWidth() / 2.0};
+
 DriveSubsystem::DriveSubsystem()
     : m_frontLeft{kFrontLeftDrivingCanId, kFrontLeftTurningCanId,
                   kFrontLeftChassisAngularOffset},
@@ -38,7 +46,51 @@ void DriveSubsystem::Periodic() {
   m_odometry.Update(frc::Rotation2d(GetHeading()),
                     {m_frontLeft.GetPosition(), m_rearLeft.GetPosition(),
                      m_frontRight.GetPosition(), m_rearRight.GetPosition()});
+  
+  std::optional<std::pair<frc::Pose2d, units::second_t>> visionPose = m_visionSubsystem.GetLatestPose();
+  if (visionPose.has_value()){
+    m_odometry.AddVisionMeasurement(visionPose.value().first, visionPose.value().second);
+  }
 }
+
+void DriveSubsystem::TurnToAngle(units::meters_per_second_t xSpeed,
+                                units::meters_per_second_t ySpeed,
+                                units::degree_t targetAngle) {
+  units::degree_t currentAngle = GetHeading();
+  const auto kp_value = 1.0 / 90.0_s; // TODO: tune this value
+  units::degree_t angleError = targetAngle - currentAngle;
+  units::degrees_per_second_t control = angleError * kp_value;
+
+  Drive(xSpeed, ySpeed, control, true);
+}
+
+void DriveSubsystem::GoToPosition(units::meter_t targetRange, frc::Translation2d target) {
+  frc::Pose2d currentPos = GetPose();
+  frc::Translation2d targetVector = target - currentPos.Translation();
+  units::meter_t currentRange = targetVector.Norm();
+  const auto kp_value = 1.0 / 2.0_s; // TODO: tune this value
+
+  TurnToTarget(targetVector.X() * kp_value, targetVector.Y() * kp_value, target);
+}
+
+void DriveSubsystem::GoToRange(units::meter_t targetRange, frc::Translation2d target) {
+  frc::Pose2d currentPos = GetPose();
+  frc::Translation2d targetVector = target - currentPos.Translation();
+  units::meter_t currentRange = targetVector.Norm();
+
+  frc::Translation2d controlVector = targetVector + (targetVector.RotateBy(frc::Rotation2d(units::degree_t{180})) / targetVector.Norm().value() * targetRange.value()); 
+}
+
+void DriveSubsystem::TurnToTarget(units::meters_per_second_t xSpeed,
+                                units::meters_per_second_t ySpeed,
+                                frc::Translation2d target){
+  frc::Pose2d currentPos = GetPose();
+  frc::Translation2d targetVector = target - currentPos.Translation();
+  units::degree_t targetAngle = targetVector.Angle().Degrees();
+
+  TurnToAngle(xSpeed, ySpeed, targetAngle);
+}
+
 
 void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
                            units::meters_per_second_t ySpeed,
@@ -67,6 +119,9 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
   m_frontRight.SetDesiredState(fr);
   m_rearLeft.SetDesiredState(bl);
   m_rearRight.SetDesiredState(br);
+
+  
+
 }
 
 void DriveSubsystem::SetX() {
@@ -109,7 +164,7 @@ double DriveSubsystem::GetTurnRate() {
   return -m_gyro.GetAngularVelocityYaw().convert<units::degrees_per_second>().value();
 }
 
-frc::Pose2d DriveSubsystem::GetPose() { return m_odometry.GetPose(); }
+frc::Pose2d DriveSubsystem::GetPose() { return m_odometry.GetEstimatedPosition(); }
 
 void DriveSubsystem::ResetOdometry(frc::Pose2d pose) {
   m_odometry.ResetPosition(
