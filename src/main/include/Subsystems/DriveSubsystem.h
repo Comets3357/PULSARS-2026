@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <frc/ADIS16470_IMU.h>
 #include <frc/filter/SlewRateLimiter.h>
 #include <frc/geometry/Pose2d.h>
 #include <frc/geometry/Rotation2d.h>
@@ -12,6 +11,8 @@
 #include <frc/kinematics/SwerveDriveKinematics.h>
 #include <frc/kinematics/SwerveDriveOdometry.h>
 #include <frc2/command/SubsystemBase.h>
+
+#include <redux/sensors/Canandgyro.h>
 
 #include "Constants.h"
 #include "MAXSwerveModule.h"
@@ -62,7 +63,7 @@ class DriveSubsystem : public frc2::SubsystemBase {
    *
    * @return the robot's heading in degrees, from 180 to 180
    */
-  units::degree_t GetHeading() const;
+  units::degree_t GetHeading();
 
   /**
    * Zeroes the heading of the robot.
@@ -110,7 +111,8 @@ class DriveSubsystem : public frc2::SubsystemBase {
   MAXSwerveModule m_rearRight;
 
   // The gyro sensor
-  frc::ADIS16470_IMU m_gyro;
+  redux::sensors::canandgyro::Canandgyro m_gyro{9};
+  units::degree_t offset{0_deg};
 
   // Odometry class for tracking robot pose
   // 4 defines the number of modules

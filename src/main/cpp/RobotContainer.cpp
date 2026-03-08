@@ -31,18 +31,20 @@ void RobotContainer::ConfigureBindings() {
   // Always intaking when not shooting.
   // Max limit on climb extension.
 
+  controller.Start().OnTrue(frc2::cmd::RunOnce([this] () { drive.ZeroHeading(); }, {}));
+
   //Putting in hopper
-  controller.B().OnTrue(frc2::cmd::RunOnce([this] () { shooterSubsystem.SetSpeed(0.5);}, {&shooterSubsystem}));
-  controller.B().OnFalse(frc2::cmd::RunOnce([this] () { shooterSubsystem.SetSpeed(0);}, {&shooterSubsystem}));
-  controller.B().OnTrue(frc2::cmd::RunOnce([this] () { indexSubsystem.SetSpeed(-0.5);}, {&indexSubsystem}));
-  controller.B().OnFalse(frc2::cmd::RunOnce([this] () { indexSubsystem.SetSpeed(0);}, {&indexSubsystem}));
+  // controller.B().OnTrue(frc2::cmd::RunOnce([this] () { shooterSubsystem.SetSpeed(0.5);}, {&shooterSubsystem}));
+  // controller.B().OnFalse(frc2::cmd::RunOnce([this] () { shooterSubsystem.SetSpeed(0);}, {&shooterSubsystem}));
+  // controller.B().OnTrue(frc2::cmd::RunOnce([this] () { indexSubsystem.SetSpeed(-0.75);}, {&indexSubsystem}));
+  // controller.B().OnFalse(frc2::cmd::RunOnce([this] () { indexSubsystem.SetSpeed(0);}, {&indexSubsystem}));
 
   //Shooting
-  controller.A().OnFalse(frc2::cmd::RunOnce([this] () { shooterSubsystem.SetSpeed(0);}, {&shooterSubsystem}));
-  controller.A().OnFalse(frc2::cmd::RunOnce([this] () { indexSubsystem.SetSpeed(0);}, {&indexSubsystem}));
+  controller.A().OnFalse(frc2::cmd::RunOnce([this] () { shooterSubsystem.SetSpeed(0.5);}, {&shooterSubsystem}));
+  controller.A().OnFalse(frc2::cmd::RunOnce([this] () { indexSubsystem.SetSpeed(-0.75);}, {&indexSubsystem}));
   
   controller.A().OnTrue(frc2::cmd::RunOnce([this] () { shooterSubsystem.SetSpeed(1); indexSubsystem.SetSpeed(0);}, {&shooterSubsystem, &indexSubsystem})
-  .AlongWith(frc2::WaitUntilCommand([this]()->bool { return shooterSubsystem.GetVelocity() > 3500;}).ToPtr())
+  .AlongWith(frc2::WaitUntilCommand([this]()->bool { return shooterSubsystem.GetVelocity() > 4000;}).ToPtr())
   .AndThen(frc2::cmd::RunOnce([this] () {indexSubsystem.SetSpeed(1);}, {&indexSubsystem})));
   
   //Climbing
