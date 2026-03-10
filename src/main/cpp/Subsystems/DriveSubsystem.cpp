@@ -14,14 +14,6 @@
 
 using namespace DriveConstants;
 
-//Field Constants:
-
-const frc::Translation2d blueHubLocation{frc::LoadAprilTagLayoutField(frc::AprilTagField::k2026RebuiltWelded).GetTagPose(26).value().ToPose2d().X() + (47.0_in / 2.0),
-            frc::LoadAprilTagLayoutField(frc::AprilTagField::k2026RebuiltWelded).GetFieldWidth() / 2.0};
-
-const frc::Translation2d redHubLocation{frc::LoadAprilTagLayoutField(frc::AprilTagField::k2026RebuiltWelded).GetTagPose(10).value().ToPose2d().X() - (47.0_in / 2.0),
-            frc::LoadAprilTagLayoutField(frc::AprilTagField::k2026RebuiltWelded).GetFieldWidth() / 2.0};
-
 DriveSubsystem::DriveSubsystem()
     : m_frontLeft{kFrontLeftDrivingCanId, kFrontLeftTurningCanId,
                   kFrontLeftChassisAngularOffset},
