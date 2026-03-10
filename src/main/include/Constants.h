@@ -11,6 +11,11 @@
 #include <units/length.h>
 #include <units/velocity.h>
 
+#include <frc/geometry/Translation2d.h>
+#include <frc/apriltag/AprilTagFieldLayout.h>
+#include <frc/apriltag/AprilTagFields.h>
+
+
 #include <numbers>
 
 #pragma once
