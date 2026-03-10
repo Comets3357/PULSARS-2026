@@ -8,6 +8,8 @@
 #include <frc2/command/Commands.h>
 #include <frc2/command/RunCommand.h>
 #include <frc2/command/WaitUntilCommand.h>
+#include <frc/DriverStation.h>
+#include "Constants.h"
 
 RobotContainer::RobotContainer() {
   ConfigureBindings();
@@ -40,18 +42,33 @@ void RobotContainer::ConfigureBindings() {
   // controller.B().OnFalse(frc2::cmd::RunOnce([this] () { indexSubsystem.SetSpeed(0);}, {&indexSubsystem}));
 
   //Shooting
-  controller.A().OnFalse(frc2::cmd::RunOnce([this] () { shooterSubsystem.SetSpeed(0.5);}, {&shooterSubsystem}));
-  controller.A().OnFalse(frc2::cmd::RunOnce([this] () { indexSubsystem.SetSpeed(-0.75);}, {&indexSubsystem}));
+  controller.RightBumper().OnFalse(frc2::cmd::RunOnce([this] () { shooterSubsystem.SetSpeed(0.5);}, {&shooterSubsystem}));
+  controller.RightBumper().OnFalse(frc2::cmd::RunOnce([this] () { indexSubsystem.SetSpeed(-0.75);}, {&indexSubsystem}));
   
-  controller.A().OnTrue(frc2::cmd::RunOnce([this] () { shooterSubsystem.SetSpeed(1); indexSubsystem.SetSpeed(0);}, {&shooterSubsystem, &indexSubsystem})
+  controller.RightBumper().OnTrue(frc2::cmd::RunOnce([this] () { shooterSubsystem.SetSpeed(1); indexSubsystem.SetSpeed(0);}, {&shooterSubsystem, &indexSubsystem})
   .AlongWith(frc2::WaitUntilCommand([this]()->bool { return shooterSubsystem.GetVelocity() > 4000;}).ToPtr())
   .AndThen(frc2::cmd::RunOnce([this] () {indexSubsystem.SetSpeed(1);}, {&indexSubsystem})));
   
   //Climbing
-  controller.RightBumper().OnTrue(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(0.3);}, {&climbSubsystem}));
-  controller.LeftBumper().OnTrue(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(-0.3);}, {&climbSubsystem}));
-  controller.RightBumper().OnFalse(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(0);}, {&climbSubsystem}));
-  controller.LeftBumper().OnFalse(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(0);}, {&climbSubsystem}));
+  //controller.RightBumper().OnTrue(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(0.3);}, {&climbSubsystem}));
+  //controller.LeftBumper().OnTrue(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(-0.3);}, {&climbSubsystem}));
+  //controller.RightBumper().OnFalse(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(0);}, {&climbSubsystem}));
+  // controller.LeftBumper().OnFalse(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(0);}, {&climbSubsystem}));
+
+  //Auto go to range
+  controller.A().WhileTrue(frc2::cmd::Run([this] () {
+    std::optional<frc::DriverStation::Alliance> alliance = frc::DriverStation::GetAlliance();
+    if (alliance.has_value()){
+        frc::Translation2d hub;
+        if (alliance.value() == frc::DriverStation::Alliance::kBlue){
+            hub = blueHubLocation;
+        }else{
+            hub = redHubLocation;
+        }
+        drive.GoToRange(2_m, hub);
+        //todo: tune range
+    }
+  }, {&drive}));
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
