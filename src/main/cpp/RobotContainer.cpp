@@ -17,17 +17,26 @@ RobotContainer::RobotContainer() {
 
 void RobotContainer::ConfigureBindings() {
   drive.SetDefaultCommand(frc2::RunCommand(
-      [this] {
-        drive.Drive(
-            -units::meters_per_second_t{frc::ApplyDeadband(
-                controller.GetLeftY(), OIConstants::kDriveDeadband)},
-            -units::meters_per_second_t{frc::ApplyDeadband(
-                controller.GetLeftX(), OIConstants::kDriveDeadband)},
-            -units::radians_per_second_t{frc::ApplyDeadband(
-                controller.GetRightX(), OIConstants::kDriveDeadband)},
-            true);
-      },
-      {&drive}));
+    [this] {
+
+    double leftY = frc::ApplyDeadband(controller.GetLeftY(), OIConstants::kDriveDeadband);
+    double leftX = frc::ApplyDeadband(controller.GetLeftX(), OIConstants::kDriveDeadband);
+    double rightX = frc::ApplyDeadband(controller.GetRightX(), OIConstants::kDriveDeadband);
+
+    std::optional<frc::DriverStation::Alliance> alliance = frc::DriverStation::GetAlliance();
+    if (alliance.value() == frc::DriverStation::Alliance::kRed) {
+      leftY = -leftY;
+      leftX = -leftX;
+      rightX = -rightX;
+    }
+
+    drive.Drive(
+      -units::meters_per_second_t{leftY},
+      -units::meters_per_second_t{leftX},
+      -units::radians_per_second_t{rightX},
+      true);
+    },
+    {&drive}));
   // Ways to make the life of the drivers easier:
   // Indexer always moving in the background but slowly. When shooting, it moves faster.
   // Always intaking when not shooting.

@@ -9,6 +9,7 @@
 #include <units/angle.h>
 #include <units/angular_velocity.h>
 #include <units/velocity.h>
+#include <frc/DriverStation.h>
 
 #include "Constants.h"
 
@@ -149,7 +150,11 @@ units::degree_t DriveSubsystem::GetHeading() {
 }
 
 void DriveSubsystem::ZeroHeading() { 
-  offset = -m_gyro.GetYaw(); 
+  if (frc::DriverStation::GetAlliance().value() == frc::DriverStation::Alliance::kRed) {
+    offset = -m_gyro.GetYaw() + 180_deg;
+  } else {
+    offset = -m_gyro.GetYaw();
+  }
 }
 
 double DriveSubsystem::GetTurnRate() {
