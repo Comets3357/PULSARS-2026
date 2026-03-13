@@ -57,15 +57,19 @@ void DriveSubsystem::TurnToAngle(units::meters_per_second_t xSpeed,
   units::degree_t currentAngle = GetHeading();
   const auto kp_value = 1.0 / 1.0_s; // TODO: tune this value
   units::degree_t angleError = targetAngle - currentAngle;
-  units::degrees_per_second_t control = angleError * kp_value;
-
 
   if (std::abs(angleError.value()) > 180.0)
   {
-
-    control = -control;
+    if (angleError.value() > 0){
+      angleError = angleError - 360.0_deg;
+    }
+    else{
+      angleError = angleError + 360.0_deg;
+    }
   }
 
+  units::degrees_per_second_t control = angleError * kp_value;
+  
   Drive(xSpeed, ySpeed, control, true);
 }
 
