@@ -59,11 +59,13 @@ void RobotContainer::ConfigureBindings() {
   .AlongWith(frc2::WaitUntilCommand([this]()->bool { return shooterSubsystem.GetVelocity() > 4000;}).ToPtr())
   .AndThen(frc2::cmd::RunOnce([this] () {indexSubsystem.SetSpeed(1);}, {&indexSubsystem})));
   
+
   //Climbing
-  //controller.RightBumper().OnTrue(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(0.3);}, {&climbSubsystem}));
-  //controller.LeftBumper().OnTrue(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(-0.3);}, {&climbSubsystem}));
-  //controller.RightBumper().OnFalse(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(0);}, {&climbSubsystem}));
-  // controller.LeftBumper().OnFalse(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(0);}, {&climbSubsystem}));
+  // controller.Y().OnTrue(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(0.5);}, {&climbSubsystem}));
+  // controller.Y().OnFalse(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(0);}, {&climbSubsystem}));
+
+  // controller.X().OnTrue(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(-0.5);}, {&climbSubsystem}));
+  // controller.X().OnFalse(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(0);}, {&climbSubsystem}));
 
   //Auto go to range
   controller.A().WhileTrue(frc2::cmd::Run([this] () {
