@@ -6,8 +6,14 @@ VisionSubsystem::VisionSubsystem() {
 
 
 std::optional<std::pair<frc::Pose2d, units::second_t>> VisionSubsystem::GetLatestPose(){
-    photon::PhotonPipelineResult result = m_camera.GetLatestResult();
-    if (result == m_latestResult){
+    auto results = m_camera.GetAllUnreadResults();
+    if (results.empty())
+    {
+        return std::nullopt;
+    }
+
+    photon::PhotonPipelineResult result = results.back();
+    if ( result == m_latestResult){
         return std::nullopt;
     }
     m_latestResult = result;

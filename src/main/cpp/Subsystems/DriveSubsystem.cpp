@@ -69,14 +69,13 @@ void DriveSubsystem::TurnToAngle(units::meters_per_second_t xSpeed,
   }
 
   units::degrees_per_second_t control = angleError * kp_value;
-  
+
   Drive(xSpeed, ySpeed, control, true);
 }
 
 void DriveSubsystem::GoToPosition(units::meter_t targetRange, frc::Translation2d target) {
   frc::Pose2d currentPos = GetPose();
   frc::Translation2d targetVector = target - currentPos.Translation();
-  units::meter_t currentRange = targetVector.Norm();
   const auto kp_value = 1.0 / 2.0_s; // TODO: tune this value
 
   TurnToTarget(targetVector.X() * kp_value, targetVector.Y() * kp_value, target);
@@ -85,7 +84,6 @@ void DriveSubsystem::GoToPosition(units::meter_t targetRange, frc::Translation2d
 void DriveSubsystem::GoToRange(units::meter_t targetRange, frc::Translation2d target) {
   frc::Pose2d currentPos = GetPose();
   frc::Translation2d targetVector = target - currentPos.Translation();
-  units::meter_t currentRange = targetVector.Norm();
   const auto kp_value = 1.0 / 2.0_s; // TODO: tune this value
 
   frc::Translation2d controlVector = targetVector + (targetVector.RotateBy(frc::Rotation2d(units::degree_t{180})) / targetVector.Norm().value() * targetRange.value()); 

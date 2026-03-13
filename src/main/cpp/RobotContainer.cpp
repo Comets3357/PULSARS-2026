@@ -13,6 +13,7 @@
 
 RobotContainer::RobotContainer() {
   ConfigureBindings();
+  ConfigureAutos();
 }
 
 void RobotContainer::ConfigureBindings() {
@@ -79,26 +80,42 @@ void RobotContainer::ConfigureBindings() {
   }, {&drive}));
 }
 
-frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
-  return frc2::cmd::Run([this] () {
-    std::optional<frc::DriverStation::Alliance> alliance = frc::DriverStation::GetAlliance();
-    if (alliance.has_value()){
-        frc::Translation2d hub;
-        if (alliance.value() == frc::DriverStation::Alliance::kBlue){
-            hub = blueHubLocation;
-        }else{
-            hub = redHubLocation;
-        }
-        drive.GoToRange(3.4_m, hub);
-    }
-  }, {&drive})
-  .RaceWith(frc2::cmd::Wait(5_s))
-  .AndThen(frc2::cmd::RunOnce([this] () {drive.Drive(0_mps, 0_mps, 0_rad_per_s, true);}, {&drive}))
-  .AndThen(frc2::cmd::RunOnce([this] () { shooterSubsystem.SetSpeed(1); indexSubsystem.SetSpeed(0);}, {&shooterSubsystem, &indexSubsystem})
-  .AlongWith(frc2::WaitUntilCommand([this]()->bool { return shooterSubsystem.GetVelocity() > 4000;}).ToPtr())
-  .AndThen(frc2::cmd::RunOnce([this] () {indexSubsystem.SetSpeed(1);}, {&indexSubsystem}))
-  .AlongWith(frc2::cmd::Wait(5_s))
-  .AndThen(frc2::cmd::RunOnce([this] () { indexSubsystem.SetSpeed(0); shooterSubsystem.SetSpeed(0); }, {&indexSubsystem, &shooterSubsystem}))
+frc2::CommandPtr RobotContainer::PotatoAuton(){
+    return frc2::cmd::Print("potato");
+}
+
+frc2::CommandPtr RobotContainer::ShootFromRangeAuton(){
+ return frc2::cmd::Run([this] () {
+      std::optional<frc::DriverStation::Alliance> alliance = frc::DriverStation::GetAlliance();
+      if (alliance.has_value()){
+          frc::Translation2d hub;
+          if (alliance.value() == frc::DriverStation::Alliance::kBlue){
+              hub = blueHubLocation;
+          }else{
+              hub = redHubLocation;
+          }
+          drive.GoToRange(3.4_m, hub);
+      }
+    }, {&drive})
+    .RaceWith(frc2::cmd::Wait(5_s))
+    .AndThen(frc2::cmd::RunOnce([this] () {drive.Drive(0_mps, 0_mps, 0_rad_per_s, true);}, {&drive}))
+    .AndThen(frc2::cmd::RunOnce([this] () { shooterSubsystem.SetSpeed(1); indexSubsystem.SetSpeed(0);}, {&shooterSubsystem, &indexSubsystem})
+    .AlongWith(frc2::WaitUntilCommand([this]()->bool { return shooterSubsystem.GetVelocity() > 4000;}).ToPtr())
+    .AndThen(frc2::cmd::RunOnce([this] () {indexSubsystem.SetSpeed(1);}, {&indexSubsystem}))
+    .AlongWith(frc2::cmd::Wait(5_s))
+    .AndThen(frc2::cmd::RunOnce([this] () { indexSubsystem.SetSpeed(0); shooterSubsystem.SetSpeed(0); }, {&indexSubsystem, &shooterSubsystem}))
   );
+}
+
+
+void RobotContainer::ConfigureAutos(){
+  autoChooser.SetDefaultOption("potato", potatoAuto.get());
+  autoChooser.AddOption("Go to range and shoot", rangeAuto.get());
+
+  frc::SmartDashboard::PutData("Auto Chooser", &autoChooser);
+}
+
+frc2::Command* RobotContainer::GetAutonomousCommand() {
+  return autoChooser.GetSelected();
 }
 

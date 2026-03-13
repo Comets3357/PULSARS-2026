@@ -31,9 +31,9 @@ void Robot::AutonomousPeriodic() {}
 void Robot::AutonomousExit() {}
 
 void Robot::TeleopInit() {
-  if (m_autonomousCommand) {
-    m_autonomousCommand->Cancel();
-  }
+  // if (m_autonomousCommand.has_value()) {
+  //   frc2::CommandScheduler::Cancel(m_autonomousCommand.value());
+  // }
 }
 
 void Robot::TeleopPeriodic() {}
