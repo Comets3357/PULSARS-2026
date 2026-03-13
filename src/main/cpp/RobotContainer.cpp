@@ -27,7 +27,7 @@ void RobotContainer::ConfigureBindings() {
     if (alliance.value() == frc::DriverStation::Alliance::kRed) {
       leftY = -leftY;
       leftX = -leftX;
-      rightX = -rightX;
+      // rightX = -rightX;
     }
 
     drive.Drive(
@@ -42,7 +42,7 @@ void RobotContainer::ConfigureBindings() {
   // Always intaking when not shooting.
   // Max limit on climb extension.
 
-  controller.Start().OnTrue(frc2::cmd::RunOnce([this] () { drive.ZeroHeading(); }, {}));
+  controller.Start().OnTrue(frc2::cmd::RunOnce([this] () { drive.ZeroHeading(); }, {}).IgnoringDisable(true));
 
   //Putting in hopper
   // controller.B().OnTrue(frc2::cmd::RunOnce([this] () { shooterSubsystem.SetSpeed(0.5);}, {&shooterSubsystem}));
@@ -74,13 +74,31 @@ void RobotContainer::ConfigureBindings() {
         }else{
             hub = redHubLocation;
         }
-        drive.GoToRange(2_m, hub);
-        //todo: tune range
+        drive.GoToRange(3.4_m, hub);
     }
   }, {&drive}));
 }
 
 frc2::CommandPtr RobotContainer::GetAutonomousCommand() {
-  return frc2::cmd::Print("No autonomous command configured");
+  return frc2::cmd::Run([this] () {
+    std::optional<frc::DriverStation::Alliance> alliance = frc::DriverStation::GetAlliance();
+    if (alliance.has_value()){
+        frc::Translation2d hub;
+        if (alliance.value() == frc::DriverStation::Alliance::kBlue){
+            hub = blueHubLocation;
+        }else{
+            hub = redHubLocation;
+        }
+        drive.GoToRange(3.4_m, hub);
+    }
+  }, {&drive})
+  .RaceWith(frc2::cmd::Wait(5_s))
+  .AndThen(frc2::cmd::RunOnce([this] () {drive.Drive(0_mps, 0_mps, 0_rad_per_s, true);}, {&drive}))
+  .AndThen(frc2::cmd::RunOnce([this] () { shooterSubsystem.SetSpeed(1); indexSubsystem.SetSpeed(0);}, {&shooterSubsystem, &indexSubsystem})
+  .AlongWith(frc2::WaitUntilCommand([this]()->bool { return shooterSubsystem.GetVelocity() > 4000;}).ToPtr())
+  .AndThen(frc2::cmd::RunOnce([this] () {indexSubsystem.SetSpeed(1);}, {&indexSubsystem}))
+  .AlongWith(frc2::cmd::Wait(5_s))
+  .AndThen(frc2::cmd::RunOnce([this] () { indexSubsystem.SetSpeed(0); shooterSubsystem.SetSpeed(0); }, {&indexSubsystem, &shooterSubsystem}))
+  );
 }
 

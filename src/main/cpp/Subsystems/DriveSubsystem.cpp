@@ -44,15 +44,27 @@ void DriveSubsystem::Periodic() {
   if (visionPose.has_value()){
     m_odometry.AddVisionMeasurement(visionPose.value().first, visionPose.value().second);
   }
+
+  m_field.SetRobotPose(m_odometry.GetEstimatedPosition());
+  frc::SmartDashboard::PutData("RobotPose", &m_field);
+
+  frc::SmartDashboard::PutNumber("GyroAngle", GetHeading().value());
 }
 
 void DriveSubsystem::TurnToAngle(units::meters_per_second_t xSpeed,
                                 units::meters_per_second_t ySpeed,
                                 units::degree_t targetAngle) {
   units::degree_t currentAngle = GetHeading();
-  const auto kp_value = 1.0 / 90.0_s; // TODO: tune this value
+  const auto kp_value = 1.0 / 1.0_s; // TODO: tune this value
   units::degree_t angleError = targetAngle - currentAngle;
   units::degrees_per_second_t control = angleError * kp_value;
+
+
+  if (std::abs(angleError.value()) > 180.0)
+  {
+
+    control = -control;
+  }
 
   Drive(xSpeed, ySpeed, control, true);
 }
@@ -70,8 +82,11 @@ void DriveSubsystem::GoToRange(units::meter_t targetRange, frc::Translation2d ta
   frc::Pose2d currentPos = GetPose();
   frc::Translation2d targetVector = target - currentPos.Translation();
   units::meter_t currentRange = targetVector.Norm();
+  const auto kp_value = 1.0 / 2.0_s; // TODO: tune this value
 
   frc::Translation2d controlVector = targetVector + (targetVector.RotateBy(frc::Rotation2d(units::degree_t{180})) / targetVector.Norm().value() * targetRange.value()); 
+
+  TurnToTarget(controlVector.X() * kp_value, controlVector.Y() * kp_value, target);
 }
 
 void DriveSubsystem::TurnToTarget(units::meters_per_second_t xSpeed,
@@ -79,7 +94,7 @@ void DriveSubsystem::TurnToTarget(units::meters_per_second_t xSpeed,
                                 frc::Translation2d target){
   frc::Pose2d currentPos = GetPose();
   frc::Translation2d targetVector = target - currentPos.Translation();
-  units::degree_t targetAngle = targetVector.Angle().Degrees();
+  units::degree_t targetAngle = targetVector.Angle().RotateBy(180_deg).Degrees();
 
   TurnToAngle(xSpeed, ySpeed, targetAngle);
 }
@@ -112,9 +127,6 @@ void DriveSubsystem::Drive(units::meters_per_second_t xSpeed,
   m_frontRight.SetDesiredState(fr);
   m_rearLeft.SetDesiredState(bl);
   m_rearRight.SetDesiredState(br);
-
-  
-
 }
 
 void DriveSubsystem::SetX() {
@@ -146,7 +158,17 @@ void DriveSubsystem::ResetEncoders() {
 }
 
 units::degree_t DriveSubsystem::GetHeading() {
-  return m_gyro.GetYaw() + offset;
+  units::degree_t current_yaw = m_gyro.GetYaw() + offset;
+  while (current_yaw > 180_deg)
+  {
+    current_yaw = current_yaw - 360_deg;
+  }
+  while (current_yaw < -180_deg)
+  {
+    current_yaw = current_yaw + 360_deg;
+  }
+
+  return current_yaw;
 }
 
 void DriveSubsystem::ZeroHeading() { 
