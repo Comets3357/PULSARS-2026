@@ -49,6 +49,8 @@ void DriveSubsystem::Periodic() {
   frc::SmartDashboard::PutData("RobotPose", &m_field);
 
   frc::SmartDashboard::PutNumber("GyroAngle", GetHeading().value());
+  frc::SmartDashboard::PutNumber("pitch", GetPitch().value());
+  frc::SmartDashboard::PutNumber("roll", GetRoll().value());
 }
 
 void DriveSubsystem::TurnToAngle(units::meters_per_second_t xSpeed,
@@ -159,8 +161,23 @@ void DriveSubsystem::ResetEncoders() {
   m_rearRight.ResetEncoders();
 }
 
+units::degree_t DriveSubsystem::GetPitch(){
+
+  units::degree_t current_pitch = m_gyro.GetPitch();
+
+  return current_pitch;
+}
+
+units::degree_t DriveSubsystem::GetRoll(){
+
+  units::degree_t current_roll = m_gyro.GetRoll();
+
+  return current_roll;
+}
+
 units::degree_t DriveSubsystem::GetHeading() {
   units::degree_t current_yaw = m_gyro.GetYaw() + offset;
+
   while (current_yaw > 180_deg)
   {
     current_yaw = current_yaw - 360_deg;

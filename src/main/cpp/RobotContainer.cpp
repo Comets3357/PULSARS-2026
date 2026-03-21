@@ -31,6 +31,12 @@ void RobotContainer::ConfigureBindings() {
       // rightX = -rightX;
     }
 
+    if (controller.LeftBumper().Get()){
+      leftY *= 0.15;
+      leftX *= 0.15;
+      rightX *= 0.15;
+    }
+
     drive.Drive(
       -units::meters_per_second_t{leftY},
       -units::meters_per_second_t{leftX},
@@ -61,11 +67,11 @@ void RobotContainer::ConfigureBindings() {
   
 
   //Climbing
-  // controller.Y().OnTrue(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(0.5);}, {&climbSubsystem}));
-  // controller.Y().OnFalse(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(0);}, {&climbSubsystem}));
+  controller.Y().OnTrue(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(0.5);}, {&climbSubsystem}));
+  controller.Y().OnFalse(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(0);}, {&climbSubsystem}));
 
-  // controller.X().OnTrue(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(-0.5);}, {&climbSubsystem}));
-  // controller.X().OnFalse(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(0);}, {&climbSubsystem}));
+  controller.X().OnTrue(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(-0.5);}, {&climbSubsystem}));
+  controller.X().OnFalse(frc2::cmd::RunOnce([this] () { climbSubsystem.SetSpeed(0);}, {&climbSubsystem}));
 
   //Auto go to range
   controller.A().WhileTrue(frc2::cmd::Run([this] () {

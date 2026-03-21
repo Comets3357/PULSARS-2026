@@ -80,6 +80,10 @@ class DriveSubsystem : public frc2::SubsystemBase {
    */
   units::degree_t GetHeading();
 
+  units::degree_t GetPitch();
+
+  units::degree_t GetRoll();
+
   /**
    * Zeroes the heading of the robot.
    */

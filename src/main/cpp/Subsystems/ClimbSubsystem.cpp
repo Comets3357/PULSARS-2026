@@ -4,7 +4,7 @@ ClimbSubsystem::ClimbSubsystem() {
   rev::spark::SparkBaseConfig config;
   config.SmartCurrentLimit(40);
   config.Inverted(true);
-  config.SetIdleMode(rev::spark::SparkBaseConfig::IdleMode::kCoast);
+  config.SetIdleMode(rev::spark::SparkBaseConfig::IdleMode::kBrake);
   m_climbMotor.Configure(config, rev::ResetMode::kResetSafeParameters,
                           rev::PersistMode::kPersistParameters);
 }
